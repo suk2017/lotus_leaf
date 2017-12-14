@@ -1,4 +1,5 @@
 <!--#include file="include/connect.asp"-->
+<!--#include file="include/UserTest.asp"-->
 <head>
     <title>更新排课信息界面</title>
     <meta charset="gb2312" />
@@ -115,7 +116,7 @@
         </div>
         <div>
             <label>确定修改吗？</label>
-            <input type="submit" name="baseInfo" value="确定" />
+            <input type="submit" name="Class" value="确定" />
             &nbsp;&nbsp;&nbsp;&nbsp;
             <input type="button" value="返回" onclick="window.close();" />
         </div>
@@ -135,7 +136,7 @@
             <% rec2.movenext
                loop %>
             </select>
-            <input type="submit" name="AddClass" value="添加这个班级" />
+            <input type="submit" name="Class" value="添加这个班级" />
         </div>
     </form>
     
@@ -152,7 +153,7 @@
             <% rec3.movenext
                loop %>
             </select>
-            <input type="submit" name="RmvClass" value="减去这个班级" />
+            <input type="submit" name="Class" value="减去这个班级" />
         </div>
     </form>
 

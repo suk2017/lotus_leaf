@@ -1,3 +1,4 @@
+<!--#include file="include/UserTest.asp"-->
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
@@ -97,10 +98,8 @@
                         <option value='10'>10</option>
                         <option value='11'>11</option>
                     </select></td>
-        </table>
         </tr>
-        <br />
-        <br />
+        </table>
         <br />
         &nbsp;
         <input type="submit" value="提交" />
@@ -110,15 +109,10 @@
         <input type="button" value="返回" onclick="window.location.href = 'CourseInfo.asp'; return false;" />
     </form>
     <%
-        response.Write(request("info"))
-'stu_id=Request("id")
+        if request("insertSucceed")&""="1" then
+            response.write "插入成功! "&request("info")
+        end if
 
-'sql="delete from Student where id='" & stu_id  &  "'"
-'response.write sql 
-'conn.execute  sql
-'Conn.Close
-'Set Conn=Nothing
-'response.Redirect "StudentInfo.asp"
     %>
 </body>
 </html>

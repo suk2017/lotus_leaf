@@ -1,4 +1,5 @@
-<!--#include file="../include/connect.asp"-->
+<!--#include file="include/connect.asp"-->
+<!--#include file="include/UserTest.asp"-->
 <% 
     '获取信息
     sname=request("stuName")    &""

@@ -1,4 +1,5 @@
 <!--#include file="include/connect.asp"-->
+<!--#include file="include/UserTest.asp"-->
 <head>
     <title>学生信息页面</title>
     <style type="text/css">
@@ -8,14 +9,18 @@
             float: left
         }
 
+        td {
+            text-align: center;
+        }
+
         .table {
             margin-right: 0;
             margin-bottom: 0;
             float: none
         }
 
-        td {
-            text-align: center;
+        .page{
+            margin-left:2%;
         }
     </style>
     <script>
@@ -29,6 +34,15 @@
             document.getElementById("sbirth")  .setAttribute("value","");
         }
     </script>
+    <%
+        if request("page")&""="" then
+            page_cur=1
+        else
+            page_cur=request("page")
+        end if
+
+        recordsPerPage=10
+    %>
 </head>
 <body>
     <%
@@ -139,10 +153,18 @@
                 'response.write sqlStr
 
                 '执行语句
+                    dim rec
                 if request("sql")&""<>"" then 
-                    set rec=conn.execute(request("sql"))
+                    'set rec=conn.execute(request("sql"))
+                    sqlllll=request("sql")
+                    set rec=server.createobject("adodb.recordset")
+                    rec.open sqlllll,conn,3
+                    rec.Move (page_cur-1)*recordsPerPage
                 else
-                    set rec=Conn.execute(sqlStr)
+                    'set rec=Conn.execute(sqlStr)
+                    set rec=server.createobject("adodb.recordset")
+                    rec.open sqlStr,conn,3
+                    rec.Move (page_cur-1)*recordsPerPage
                 end if
             %>
             <tr height="40px">
@@ -167,7 +189,7 @@
 
                 '设置一个步进变量（可以用for循环代替）
                 ii=0
-                do while not rec.eof
+                do while (not rec.eof) and (ii < recordsPerPage)
                     '每行记录的开始
                     response.write "<tr height=""40px"">"
                 
@@ -187,9 +209,9 @@
                             end if
 	                    next
                         if request("upd")&""<>"1" then
-                            response.write "<td><a href='StudentInfo.asp?upd=1&count="&ii&"&sql="&sqlStr&"'>修改</a></td>"
+                            response.write "<td><a href='StudentInfo.asp?upd=1&count="&ii&"&sql="&sqlStr&"&page="&page_cur&"'>修改</a></td>"
                             'response.write "<td><input type='button' onclick=""window.location.href='StudentInfo.asp?upd=1&count="&ii&"&sql="&sqlStr&"';return false;"" value='修改' /></td>"
-                            response.write "<td><a href='StudentInfo.asp?del=1&id="&rec(0)&"&sname="&request("sname")&"&sgender="&request("sgender")&"&sspe="&request("sspe")&"&sclass="&request("sclass")&"&sgrade="&request("sgrade")&"'>删除</a></td>"
+                            response.write "<td><a href='StudentInfo.asp?del=1&id="&rec(0)&"&sname="&request("sname")&"&sgender="&request("sgender")&"&sspe="&request("sspe")&"&sclass="&request("sclass")&"&sgrade="&request("sgrade")&"&page="&page_cur&"'>删除</a></td>"
                         end if
                     else'若是需要修改的行
                         '准备数据
@@ -229,7 +251,7 @@
                         response.write "<td><input type='date' value='"&rec(6)&"' name='usbirth' /></td>"
 
                         'response.write "<td><input type='button' value='提交' onclick=""window.location.href='StudentInfo.asp?exec_upd=1&id="&rec(0)&"&name="&rec(1)&"&stugender="&rec(2)&"&spe="&rec(3)&"&class="&rec(4)&"&grade="&rec(5)&"&birth="&rec(6)&"';return false;""/></td>"
-                        response.write "<td><input type='button' value='取消' onclick=""window.location.href='StudentInfo.asp?sql="&request("sql")&"';return false;""/></td>"
+                        response.write "<td><input type='button' value='取消' onclick=""window.location.href='StudentInfo.asp?sql="&request("sql")&"&page="&page_cur&"';return false;""/></td>"
                         response.write "<td><input type='submit' name='exec_upd_Btn' value='提交' /></td>"
                     
                         response.write "</form>"
@@ -241,10 +263,30 @@
 	            loop
             %>
         </table>
+
+        <label>当前页数：</label>
+        <%
+            count=rec.recordcount-1
+            pages=(int)(count/recordsPerPage + 1)
+
+            for i=1 to pages
+                if i&""=page_cur&"" then
+            %>
+        <label class="page">(<%=i %>)</label>
+        <%
+                else
+        %>
+        <a class="page" href="StudentInfo.asp?page=<%=i %>"><%=i %></a>
+        <%
+                end if
+            next    
+        %>
     </div>
 
     <%
         '释放资源
+        'rec_class.close
+        set rec_class=nothing
         rec.close
         set rec=nothing
         Conn.close

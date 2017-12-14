@@ -1,4 +1,5 @@
 <!--#include file="include/connect.asp"-->
+<!--#include file="include/UserTest.asp"-->
 <head>
     <title>排课信息页面</title>
     <style type="text/css">
@@ -8,14 +9,18 @@
             float: left
         }
 
+        td {
+            text-align: center;
+        }
+
         .table {
             margin-right: 0;
             margin-bottom: 0;
             float: none
         }
 
-        td {
-            text-align: center;
+        .page{
+            margin-left:2%;
         }
     </style>
     <script>
@@ -29,6 +34,15 @@
             document.getElementById("cgrade")   .setAttribute("value","");
         }
     </script>
+    <%
+        if request("page")&""="" then
+            page_cur=1
+        else
+            page_cur=request("page")
+        end if
+
+        recordsPerPage=8
+    %>
 </head>
 <body>
     <%
@@ -139,10 +153,18 @@
                 'response.write sqlStr
 
                 '执行语句
+                dim rec
                 if request("sql")&""<>"" then '若要求使用上次的条件查询
-                    set rec=conn.execute(request("sql"))
+                    'set rec=conn.execute(request("sql"))
+                    sqlllll=request("sql")
+                    set rec=server.createobject("adodb.recordset")
+                    rec.open sqlllll,conn,3
+                    rec.Move (page_cur-1)*recordsPerPage
                 else'否则使用当前条件查询
-                    set rec=Conn.execute(sqlStr)
+                    'set rec=Conn.execute(sqlStr)
+                    set rec=server.createobject("adodb.recordset")
+                    rec.open sqlStr,conn,3
+                    rec.Move (page_cur-1)*recordsPerPage
                 end if
             %>
             <tr height="40px">
@@ -151,14 +173,14 @@
                 for i=0 to 6 'rec.fields.count-1
                     response.write "<th>"&rec.fields(i).name&"</th>"
                 next
-                response.write "<th colspan='2' align='center'><a href='insertCourse.asp'>添加排课</a></th>"
+                response.write "<th colspan='2' align='center'><a href='CourseInsert.asp'>添加排课</a></th>"
                 %>
             </tr>
 
             <%
                 '======循环输出数据=====
-
-                do while not rec.eof
+                ii=0
+                do while (not rec.eof) and (ii < recordsPerPage)
                     '每行记录的开始
                     response.write "<tr height=""40px"">"
                 
@@ -175,9 +197,26 @@
 
 	                response.write "</tr>"
 	                rec.movenext
+                    ii=ii+1
 	            loop
             %>
         </table>
+        <label>当前页数：</label>
+        <%
+            count=rec.recordcount-1
+            pages=count/recordsPerPage + 1
+            for i=1 to pages
+                if i&""=page_cur&"" then
+            %>
+        <label class="page">(<%=i %>)</label>
+        <%
+                else
+        %>
+        <a class="page" href="Courses.asp?page=<%=i %>"><%=i %></a>
+        <%
+                end if
+            next    
+        %>
     </div>
 
     <%

@@ -1,4 +1,5 @@
 <!--#include file="include/connect.asp"-->
+<!--#include file="include/UserTest.asp"-->
 <head>
     <title>课程信息页面</title>
     <style type="text/css">
@@ -7,6 +8,10 @@
             margin-bottom: 10px;
             float: left
         }
+        
+        td {
+            text-align: center;
+        }
 
         .table {
             margin-right: 0;
@@ -14,8 +19,8 @@
             float: none
         }
 
-        td {
-            text-align: center;
+        .page{
+            margin-left:2%;
         }
     </style>
     <script>
@@ -28,6 +33,15 @@
             document.getElementById("cte")     .setAttribute("selected","selected");
         }
     </script>
+    <%
+        if request("page")&""="" then
+            page_cur=1
+        else
+            page_cur=request("page")
+        end if
+
+        recordsPerPage=9
+    %>
 </head>
 <body>
     <%
@@ -148,10 +162,18 @@
                 'response.write sqlStr
 
                 '执行语句
+                    dim rec
                 if request("sql")&""<>"" then 
-                    set rec=conn.execute(request("sql"))
+                    'set rec=conn.execute(request("sql"))
+                    sqlllll=request("sql")
+                    set rec=server.createobject("adodb.recordset")
+                    rec.open sqlllll,conn,3
+                    rec.Move (page_cur-1)*recordsPerPage
                 else
-                    set rec=Conn.execute(sqlStr)
+                    'set rec=Conn.execute(sqlStr)
+                    set rec=server.createobject("adodb.recordset")
+                    rec.open sqlStr,conn,3
+                    rec.Move (page_cur-1)*recordsPerPage
                 end if
             %>
             <tr height="40px">
@@ -176,7 +198,7 @@
 
                 '设置一个步进变量（可以用for循环代替）
                 ii=0
-                do while not rec.eof
+                do while (not rec.eof) and (ii < recordsPerPage)
                     '每行记录的开始
                     response.write "<tr height=""40px"">"
                 
@@ -186,8 +208,8 @@
 	                        response.write "<td>"&rec(i)&"</td>"
 	                    next
                         if request("upd")&""<>"1" then
-                            response.write "<td><a href='CourseInfo.asp?upd=1&count="&ii&"&sql="&sqlStr&"'>修改</a></td>"
-                            response.write "<td><a href='CourseInfo.asp?del=1&id="&rec(0)&"'>删除</a></td>"
+                            response.write "<td><a href='CourseInfo.asp?upd=1&count="&ii&"&sql="&sqlStr&"&page="&page_cur&"'>修改</a></td>"
+                            response.write "<td><a href='CourseInfo.asp?del=1&id="&rec(0)&"&page="&page_cur&"'>删除</a></td>"
                         end if
                     else'若是需要修改的行
                         
@@ -240,6 +262,22 @@
 	            loop
             %>
         </table>
+        <label>当前页数：</label>
+        <%
+            count=rec.recordcount-1
+            pages=count/recordsPerPage + 1
+            for i=1 to pages
+                if i&""=page_cur&"" then
+            %>
+        <label class="page">(<%=i %>)</label>
+        <%
+                else
+        %>
+        <a class="page" href="CourseInfo.asp?page=<%=i %>"><%=i %></a>
+        <%
+                end if
+            next    
+        %>
     </div>
 
     <%

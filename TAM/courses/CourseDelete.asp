@@ -1,4 +1,5 @@
 <!--#include file="include/connect.asp"-->
+<!--#include file="include/UserTest.asp"-->
 <head>
     <title>删除排课信息页面</title>
     <meta charset="gb2312" />
